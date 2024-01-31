@@ -3,9 +3,9 @@
 
 volatile uint32_t ms_ticks = 0;
 
-void HAL_SYSTICK_Callback(void)
+void HAL_IncTick(void)
 {
-	ms_ticks++;
+    ms_ticks++;
 }
 
 void delay_ms(uint32_t delay_time_ms)
@@ -42,12 +42,12 @@ void app_main(void)
     my_GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOC, &my_GPIO_InitStruct);
 
-    // Config the clk src for systick.
-    // SYSTICK_CLKSOURCE_HCLK mean clk take from AHB.
-    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-
-    // Quyet dinh xai 8000000 lam SysTick Load, de tranh loi TickCount
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq());
+    /*
+    * Do ham HAL_SYSTICK_config luon mac dinh lay clock la AHB khong chia cho 8
+    * nen, T = 1 / 8*10^6 = 1.25*10^-7, de co tick cho 1ms thi SysTick_load = 1*10^-3/1.25*10-7
+    */
+    // 1tick = 1Mhz = 1ns, 1ms = 1khz = 1000 tick
+    HAL_SYSTICK_Config(8000);
 
     while(1)
     {
